@@ -112,7 +112,8 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         """
         Updates an instance based on the class name and id
-        Usage: update <class_name> <instance_id> <attribute_name> <attribute_value>
+        Usage:
+        update <class_name> <instance_id> <attribute_name> <attribute_value>
         """
         args = arg.split()
         if not args:
@@ -132,13 +133,12 @@ class HBNBCommand(cmd.Cmd):
                 attribute_name = args[2]
                 attribute_value = args[3]
                 if hasattr(instance, attribute_name):
-                    attribute_value = type(getattr(instance, attribute_name))(attribute_value)
+                    attribute_value = \
+                    type(getattr(instance, attribute_name))(attribute_value)
                     setattr(instance, attribute_name, attribute_value)
                     instance.save()
                 else:
                     print("** attribute doesn't exist **")
-
-
 
     def default(self, line):
         """Handles default behavior for unrecognized commands"""
@@ -147,8 +147,10 @@ class HBNBCommand(cmd.Cmd):
             class_and_method = command_parts[1].split("(")
             class_name = command_parts[0]
             method_name = class_and_method[0]
-            if class_name in HBNBCommand.classes and len(class_and_method) >= 2:
-                instance_id = class_and_method[1].split(",")[0].replace("(", "").replace("'", "").replace('"', '').strip()
+            if class_name in HBNBCommand.classes\
+                and len(class_and_method) >= 2:
+                instance_id = class_and_method[1]\
+                    .split(",")[0].replace("(", "").replace("'", "").replace('"', '').strip()
                 if method_name == "show":
                     command = f"show {class_name} {instance_id}"
                     self.onecmd(command)
@@ -158,19 +160,25 @@ class HBNBCommand(cmd.Cmd):
                     self.onecmd(command)
                     return
                 elif method_name == "update":
-                    command_args = class_and_method[1].split(",", maxsplit=1)[1].replace(")", "").strip()
+                    command_args = class_and_method[1]\
+                        .split(",", maxsplit=1)[1].replace(")", "").strip()
                     try:
                         attributes_dict = eval(command_args)
                         if isinstance(attributes_dict, dict):
-                            for attribute_name, attribute_value in attributes_dict.items():
-                                attribute_name = attribute_name.strip().replace("'", "").replace('"', '')
-                                attribute_value = str(attribute_value).strip().replace("'", "").replace('"', '')
-                                command = f"update {class_name} {instance_id} {attribute_name} {attribute_value}"
+                            for attribute_name, attribute_value\
+                                in attributes_dict.items():
+                                attribute_name = attribute_name\
+                                .strip().replace("'", "").replace('"', '')
+                                attribute_value = str(attribute_value)\
+                                .strip().replace("'", "").replace('"', '')
+                                command = f"update {class_name}
+                                {instance_id} {attribute_name} {attribute_value}"
                                 self.onecmd(command)
                             return
                     except (SyntaxError, NameError):
                         pass
         print("*** Unknown syntax: {}".format(line))
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
