@@ -16,15 +16,7 @@ from models.review import Review
 class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB project"""
     prompt = "(hbnb) "
-    classes = {
-        "BaseModel": BaseModel,
-        "User": User,
-        "Place": Place,
-        "State": State,
-        "City": City,
-        "Amenity": Amenity,
-        "Review": Review
-    }
+    classes = {"BaseModel": BaseModel, "User": User, "Place": Place, "State": State, "City": City, "Amenity": Amenity, "Review": Review}
 
     def do_quit(self, arg):
         """Quit command to exit the program"""
@@ -121,57 +113,77 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
         elif len(args) < 2:
             print("** instance id missing **")
+        elif len(args) < 3:
+            print("** attribute name missing **")
         elif len(args) < 4:
-            print("** attribute name and/or value missing **")
+            print("** value missing **")
         else:
             key = f"{args[0]}.{args[1]}"
             if key not in storage.all():
                 print("** no instance found **")
             else:
                 instance = storage.all()[key]
-                attribute_name = args[2]
-                attribute_value = args[3]
-                if hasattr(instance, attribute_name):
-                    attribute_value = type(getattr(instance, attribute_name))(attribute_value)
-                    setattr(instance, attribute_name, attribute_value)
-                    instance.save()
-                else:
-                    print("** attribute doesn't exist **")
-
-
+                attribute_dict = eval(args[2])
+                for attr, value in attribute_dict.items():
+                    setattr(instance, attr, value)
+                instance.save()
 
     def default(self, line):
         """Handles default behavior for unrecognized commands"""
         command_parts = line.split(".")
         if len(command_parts) == 2:
-            class_and_method = command_parts[1].split("(")
             class_name = command_parts[0]
-            method_name = class_and_method[0]
-            if class_name in HBNBCommand.classes and len(class_and_method) >= 2:
-                instance_id = class_and_method[1].split(",")[0].replace("(", "").replace("'", "").replace('"', '').strip()
-                if method_name == "show":
-                    command = f"show {class_name} {instance_id}"
+            if class_name in HBNBCommand.classes:
+                command = command_parts[1].split("(")[0]
+                if command == "all":
+                    class_name = command_parts[0]
+                    command = "all {}".format(class_name)
                     self.onecmd(command)
                     return
-                elif method_name == "destroy":
-                    command = f"destroy {class_name} {instance_id}"
+                elif command == "show":
+                    args = command_parts[1].split("(")[1].split(")")[0].split(",")
+                    instance_id = args[0].strip(' \'"')
+                    command = "show {} {}".format(class_name, instance_id)
                     self.onecmd(command)
                     return
-                elif method_name == "update":
-                    command_args = class_and_method[1].split(",", maxsplit=1)[1].replace(")", "").strip()
-                    try:
-                        attributes_dict = eval(command_args)
-                        if isinstance(attributes_dict, dict):
-                            for attribute_name, attribute_value in attributes_dict.items():
-                                attribute_name = attribute_name.strip().replace("'", "").replace('"', '')
-                                attribute_value = str(attribute_value).strip().replace("'", "").replace('"', '')
-                                command = f"update {class_name} {instance_id} {attribute_name} {attribute_value}"
-                                self.onecmd(command)
-                            return
-                    except (SyntaxError, NameError):
-                        pass
-        print("*** Unknown syntax: {}".format(line))
+                elif command == "destroy":
+                    args = command_parts[1].split("(")[1].split(")")[0].split(",")
+                    instance_id = args[0].strip(' \'"')
+                    command = "destroy {} {}".format(class_name, instance_id)
+                    self.onecmd(command)
+                    return
+                elif command == "update":
+                    args = command_parts[1].split("(")[1].split(")")[0].split(",")
+                    instance_id = args[0].strip(' \'"')
+                    attribute_name = args[1].strip(' \'"')
+                    attribute_value = args[2].strip(' \'"')
+                    command = "update {} {} {} {}".format(class_name, instance_id, attribute_name, attribute_value)
+                    self.onecmd(command)
+                    return
+                elif command == "count":
+                    command = "count {}".format(class_name)
+                    self.onecmd(command)
+                    return
 
+        print("*** Unknown syntax: {}".format(line))
+    def do_count(self, arg):
+        """
+        Counts the number of instances of a class
+        Usage: count <class_name>
+        """
+        args = arg.split()
+        if not args:
+            print("** class name missing **")
+        elif args[0] not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+        else:
+            class_name = args[0]
+            count = 0
+            for key in storage.all():
+                if key.split('.')[0] == class_name:
+                    count += 1
+            print(count)
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
+    
