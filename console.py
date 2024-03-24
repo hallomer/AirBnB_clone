@@ -16,7 +16,59 @@ from models.review import Review
 class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB project"""
     prompt = "(hbnb) "
-    classes = {"BaseModel": BaseModel, "User": User, "Place": Place, "State": State, "City": City, "Amenity": Amenity, "Review": Review}
+    classes = {"BaseModel": BaseModel, "User": User, "Place": Place,
+               "State": State, "City": City,
+               "Amenity": Amenity, "Review": Review}
+
+    def help_help(self):
+        """Help documentation for help method"""
+        output = """Help:
+    how to use
+        create  Usage: create <class name>
+        show    Usage: show <class name> <ID>
+        destroy Usage: destroy <class name> <ID>
+        all     Usage: all <class name > || all
+        update  Usage: update <class name> <ID>\
+            <attribute name> <attribute value>
+        count   Usage: count <class_name>"""
+        print(output)
+        return
+
+    def help_quit(self):
+        """Help documentation for quit method"""
+        print("Quit the command interpreter\n")
+
+    def help_EOF(self):
+        """Help documentation for EOF method"""
+        print("EOF Quit the command interpreter\n")
+
+    def help_create(self):
+        """Help documentation for create method"""
+        print("Usage: create <class name>")
+        return
+
+    def help_show(self):
+        """Help documentation for show method"""
+        print("Usage: show <class name> <ID>")
+        return
+
+    def help_destroy(self):
+        """Help documentation for destroy method"""
+        print("Usage: destroy <class name> <ID>")
+        return
+
+    def help_all(self):
+        """Help documentation for all method"""
+        print("all <class name > || all")
+
+    def help_update(self):
+        """Help documentation for update method"""
+        print("Usage: update <class name> <id> \
+              <attribute name> \"<attribute value>\"")
+
+    def help_count(self):
+        """Help documentation for count method"""
+        print("Usage: count <class_name>")
 
     def do_quit(self, arg):
         """Quit command to exit the program"""
@@ -104,7 +156,7 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         """
         Updates an instance based on the class name and id
-        Usage: update <class_name> <instance_id> <attribute_name> <attribute_value>
+        Usage:update<class_name><instance_id><attribute_name><attribute_value>
         """
         args = arg.split()
         if not args:
@@ -122,11 +174,8 @@ class HBNBCommand(cmd.Cmd):
             if key not in storage.all():
                 print("** no instance found **")
             else:
-                instance = storage.all()[key]
-                attribute_dict = eval(args[2])
-                for attr, value in attribute_dict.items():
-                    setattr(instance, attr, value)
-                instance.save()
+                setattr(storage.all()[key], args[2], args[3])
+                storage.all()[key].save()
 
     def default(self, line):
         """Handles default behavior for unrecognized commands"""
@@ -141,31 +190,35 @@ class HBNBCommand(cmd.Cmd):
                     self.onecmd(command)
                     return
                 elif command == "show":
-                    args = command_parts[1].split("(")[1].split(")")[0].split(",")
+                    args = command_parts[1]\
+                        .split("(")[1].split(")")[0].split(",")
                     instance_id = args[0].strip(' \'"')
                     command = "show {} {}".format(class_name, instance_id)
                     self.onecmd(command)
                     return
                 elif command == "destroy":
-                    args = command_parts[1].split("(")[1].split(")")[0].split(",")
+                    args = command_parts[1]\
+                        .split("(")[1].split(")")[0].split(",")
                     instance_id = args[0].strip(' \'"')
                     command = "destroy {} {}".format(class_name, instance_id)
                     self.onecmd(command)
                     return
                 elif command == "update":
-                    args = command_parts[1].split("(")[1].split(")")[0].split(",")
+                    args = command_parts[1]\
+                        .split("(")[1].split(")")[0].split(",")
                     instance_id = args[0].strip(' \'"')
                     attribute_name = args[1].strip(' \'"')
                     attribute_value = args[2].strip(' \'"')
-                    command = "update {} {} {} {}".format(class_name, instance_id, attribute_name, attribute_value)
+                    command = f"update {class_name} {instance_id}\
+                        {attribute_name} {attribute_value}"
                     self.onecmd(command)
                     return
                 elif command == "count":
                     command = "count {}".format(class_name)
                     self.onecmd(command)
                     return
-
         print("*** Unknown syntax: {}".format(line))
+
     def do_count(self, arg):
         """
         Counts the number of instances of a class
@@ -184,6 +237,6 @@ class HBNBCommand(cmd.Cmd):
                     count += 1
             print(count)
 
+
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
-    
