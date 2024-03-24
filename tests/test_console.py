@@ -8,6 +8,7 @@ from io import StringIO
 from models import storage
 from console import HBNBCommand
 
+
 class TestHBNBCommand(unittest.TestCase):
     """
     Test cases for the HBNBCommand class
@@ -27,7 +28,8 @@ class TestHBNBCommand(unittest.TestCase):
         show    Usage: show <class name> <ID>
         destroy Usage: destroy <class name> <ID>
         all     Usage: all <class name > || all
-        update  Usage: update <class name> <ID>            <attribute name> <attribute value>
+        update  Usage: update <class name> <ID>\
+            <attribute name> <attribute value>
         count   Usage: count <class_name>"""
         self.assertEqual(output.strip(), expected_output.strip())
 
@@ -55,7 +57,7 @@ class TestHBNBCommand(unittest.TestCase):
         with patch('sys.stdout', new=StringIO()) as f:
             self.cli.do_create('BaseModel')
         output = f.getvalue().strip()
-        self.assertRegex(output, r'^\w+$')
+        self.assertRegex(output, r'^[\w-]+$')
 
     def test_do_show(self):
         """Test the do_show method"""
@@ -98,6 +100,7 @@ class TestHBNBCommand(unittest.TestCase):
             self.cli.do_count('BaseModel')
         output = f.getvalue().strip()
         self.assertEqual(output, '0')
+
 
 if __name__ == '__main__':
     unittest.main()
