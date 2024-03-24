@@ -16,9 +16,15 @@ from models.review import Review
 class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB project"""
     prompt = "(hbnb) "
-    classes = {"BaseModel": BaseModel, "User": User, "Place": Place,
-               "State": State, "City": City,
-               "Amenity": Amenity, "Review": Review}
+    classes = {
+        'BaseModel': BaseModel,
+        'User': User,
+        'Place': Place,
+        'State': State,
+        'City': City,
+        'Amenity': Amenity,
+        'Review': Review
+    }
 
     def help_help(self):
         """Help documentation for help method"""
