@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """file storage class - serialization and deserialization"""
 import json
-import os
 
 
 class FileStorage:
@@ -47,9 +46,12 @@ class FileStorage:
             "Review": Review
         }
 
-        if os.path.exists(FileStorage.__file_path):
-            with open(FileStorage.__file_path, 'r') as f:
-                data = json.load(f)
-                for value in data.values():
-                    class_name = value.get('__class__')
-                    self.new(classes[class_name](**value))
+        try:
+            with open(FileStorage.__file_path, "r") as f:
+                obj_dict = json.load(f)
+                for obj_key, obj_dict in obj_dict.items():
+                    cls_name = obj_dict["__class__"]
+                    cls = classes[cls_name]
+                    FileStorage.__objects[obj_key] = cls(**obj_dict)
+        except FileNotFoundError:
+            pass
