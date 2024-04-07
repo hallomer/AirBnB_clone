@@ -1,0 +1,19 @@
+footer {
+    background-color: rgb(162, 162, 222);
+    color: rgb(12, 10, 10);
+    height: auto;
+    width: 100%;
+    text-align: center;
+    line-height: auto;
+    position: static;
+    bottom: 0;
+    border-top: 1px solid #CCCCCC;
+}
+
+@media (max-width: 738px) {
+    footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
